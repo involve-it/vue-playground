@@ -1,9 +1,10 @@
 import { ActionContext, ActionTree } from 'vuex'
+import Axios from 'axios'
 import { Mutations, MutationType } from './mutations'
-import { State } from './state'
+import {PhonebookItem, State} from './state'
 
 export enum ActionTypes {
-  GetTaskItems = 'GET_Task_ITEMS',
+  GetTaskItems = 'GET_Phonebook_ITEMS',
   SetCreateModal = 'SET_CREATE_MODAL',
   SetEditModal = 'SET_EDIT_MODAL'
 }
@@ -28,28 +29,17 @@ const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 export const actions: ActionTree<State, State> & Actions = {
   async [ActionTypes.GetTaskItems]({ commit }) {
     commit(MutationType.SetLoading, true)
-
-    await sleep(1000)
-
-    commit(MutationType.SetLoading, false)
-    commit(MutationType.SetTasks, [
-      {
-        id: 1,
-        title: 'Create a new programming language',
-        description: "The programing language should have full typescript support ",
-        createdBy: "Emmanuel John",
-        assignedTo: "Saviour Peter",
-        completed: false,
-        editing: false
-
-      }
-    ])
+    Axios.get('/data/phonebook.json')
+        .then((response: { data: PhonebookItem[] }) => {
+          commit(MutationType.SetItems, response.data)
+          commit(MutationType.SetLoading, false)
+        })
   },
 
   async [ActionTypes.SetCreateModal]({ commit }) {
     commit(MutationType.SetCreateModal, true)
   },
   async [ActionTypes.SetEditModal]({ commit }) {
-    commit(MutationType.SetEditModal, {showModal: true, taskId: 1})
+    commit(MutationType.SetEditModal, {showModal: true, itemId: 1})
   }
 }

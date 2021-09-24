@@ -1,29 +1,28 @@
-export type TaskItem = {
+export type PhonebookItem = {
   id: number;
-  title: string;
-  description: string;
-  createdBy: string;
-  assignedTo: string;
-  completed: boolean;
+  phoneNumber: string;
+  email: string;
+  firstName: string;
+  lastName: string;
   editing: boolean;
 };
 
 export type State = {
   loading: boolean;
-  tasks: TaskItem[];
+  items: PhonebookItem[];
   showCreateModal: boolean;
   showEditModal: boolean;
-  showTaskModal: boolean;
-  editModalTaskId: number | undefined;
-  showTaskId: number | undefined;
+  showItemModal: boolean;
+  editModalItemId: number | undefined;
+  showItemId: number | undefined;
 };
 
 export const state: State = {
   loading: false,
-  tasks: [],
+  items: [],
   showCreateModal: false,
   showEditModal: false,
-  showTaskModal: false,
-  editModalTaskId: undefined,
-  showTaskId: undefined,
+  showItemModal: false,
+  editModalItemId: undefined,
+  showItemId: undefined,
 };

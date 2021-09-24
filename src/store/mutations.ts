@@ -1,94 +1,84 @@
 import { MutationTree } from 'vuex'
-import { State, TaskItem } from './state'
+import { State, PhonebookItem } from './state'
 
 export enum MutationType {
-  CreateTask = 'CREATE_TASK',
-  SetTasks = 'SET_TASKS',
-  CompleteTask = 'COMPLETE_TASK',
-  RemoveTask = 'REMOVE_TASK',
-  EditTask = 'EDIT_TASK',
-  UpdateTask = `UPDATE_TASK`,
+  CreateItem = 'CREATE_ITEM',
+  SetItems = 'SET_ITEMS',
+  RemoveItem = 'REMOVE_ITEM',
+  EditItem = 'EDIT_ITEM',
+  UpdateItem = `UPDATE_ITEM`,
 
   SetLoading = 'SET_LOADING',
   SetCreateModal = 'SET_CREATE_MODAL',
   SetEditModal = 'SET_EDIT_MODAL',
-  SetTaskModal = 'SET_TASK_MODAL'
+  SetItemModal = 'SET_ITEM_MODAL'
 }
 
 export type Mutations = {
 
-  [MutationType.CreateTask](state: State, task: TaskItem): void;
-  [MutationType.SetTasks](state: State, tasks: TaskItem[]): void;
-  [MutationType.CompleteTask](
+  [MutationType.CreateItem](state: State, item: PhonebookItem): void;
+  [MutationType.SetItems](state: State, items: PhonebookItem[]): void;
+  [MutationType.RemoveItem](
     state: State,
-    task: Partial<TaskItem> & { id: number }
+    item: Partial<PhonebookItem> & { id: number }
   ): void;
-  [MutationType.RemoveTask](
+  [MutationType.EditItem](
     state: State,
-    task: Partial<TaskItem> & { id: number }
+    item: Partial<PhonebookItem> & { id: number }
   ): void;
-  [MutationType.EditTask](
+  [MutationType.UpdateItem](
     state: State,
-    task: Partial<TaskItem> & { id: number }
-  ): void;
-  [MutationType.UpdateTask](
-    state: State,
-    task: Partial<TaskItem> & { id: number }
+    item: Partial<PhonebookItem> & { id: number }
   ): void;
 
   [MutationType.SetLoading](state: State, value: boolean): void;
   [MutationType.SetCreateModal](state: State, value: boolean): void;
-  [MutationType.SetEditModal](state: State, value: {showModal: boolean, taskId: number|undefined}): void;
-  [MutationType.SetTaskModal](state: State, value: {showModal: boolean, taskId: number|undefined}): void;
+  [MutationType.SetEditModal](state: State, value: {showModal: boolean; itemId: number|undefined}): void;
+  [MutationType.SetItemModal](state: State, value: {showModal: boolean; itemId: number|undefined}): void;
 };
 
 export const mutations: MutationTree<State> & Mutations = {
-  [MutationType.CreateTask](state, task) {
-    state.tasks.unshift(task)
+  [MutationType.CreateItem](state, item) {
+    state.items.unshift(item)
   },
-  [MutationType.SetTasks](state, tasks) {
-    state.tasks = tasks
+  [MutationType.SetItems](state, items) {
+    state.items = items
   },
-  [MutationType.CompleteTask](state, newTask) {
-    const task = state.tasks.findIndex(element => element.id === newTask.id)
-    if (task === -1) return
-    state.tasks[task] = { ...state.tasks[task], ...newTask }
+  [MutationType.RemoveItem](state, item) {
+    const itemIndex = state.items.findIndex(element => element.id === item.id)
+    if (itemIndex === -1) return
+    //If item exist in the state, remove it
+    state.items.splice(itemIndex, 1)
   },
-  [MutationType.RemoveTask](state, Task) {
-    const task = state.tasks.findIndex(element => element.id === Task.id)
-    if (task === -1) return
-    //If Task exist in the state, remove it
-    state.tasks.splice(task, 1) 
+  [MutationType.EditItem](state, item) {
+    const itemIndex = state.items.findIndex(element => element.id === item.id)
+    if (itemIndex === -1) return
+    //If item exist in the state, toggle the editing property
+    state.items[itemIndex] = { ...state.items[itemIndex], editing: !state.items[itemIndex].editing }
+    console.log('item index#', state.items[itemIndex])
   },
-  [MutationType.EditTask](state, Task) {
-    const task = state.tasks.findIndex(element => element.id === Task.id)
-    if (task === -1) return
-    //If Task exist in the state, toggle the editing property
-    state.tasks[task] = { ...state.tasks[task], editing: !state.tasks[task].editing } 
-    console.log("taskino", state.tasks[task])
-  },
-  [MutationType.UpdateTask](state, Task) {
-    state.tasks = state.tasks.map(task => {
-      if(task.id === Task.id) {
-        return {...task, ...Task}
+  [MutationType.UpdateItem](state, item) {
+    state.items = state.items.map(element => {
+      if(element.id === item.id) {
+        return {...element, ...item}
       }
-      return task;
+      return element;
     })
   },
 
   [MutationType.SetLoading](state, value) {
     state.loading = value
-    console.log("I am loading...")
+    console.log('I am loading...')
   },
   [MutationType.SetCreateModal](state, value) {
     state.showCreateModal = value
   },
   [MutationType.SetEditModal](state, value) {
     state.showEditModal = value.showModal
-    state.editModalTaskId = value.taskId
+    state.editModalItemId = value.itemId
   },
-  [MutationType.SetTaskModal](state, {showModal, taskId}) {
-    state.showTaskModal = showModal
-    state.showTaskId = taskId
+  [MutationType.SetItemModal](state, {showModal, itemId}) {
+    state.showItemModal = showModal
+    state.showItemId = itemId
   }
 }

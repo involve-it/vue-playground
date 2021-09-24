@@ -2,18 +2,17 @@
   <div class="modal is-active">
     <div class="modal-background"></div>
     <div class="modal-content">
-      <h1>VIEW TASK</h1>
+      <h1>View Phonebook Item</h1>
       <div class="card">
         <div class="card-content">
           <div class="media">
             <div class="media-content">
-              <p class="title is-4">Title: {{ task.title }}</p>   
-              <p class="subtitle is-6"> <b>Assigned To:</b>  {{ task.assignedTo }}</p>
-              <p class="subtitle is-6"> <b>Created By:</b>  {{ task.createdBy }}</p>
+              <p class="title is-4">ID: {{ item.id }}</p>
+              <p class="subtitle is-6"> <label class="label">Phone Number:</label>  {{ item.phoneNumber }}</p>
+              <p class="subtitle is-6"> <label class="label">Email:</label>  {{ item.email }}</p>
+              <p class="subtitle is-6"> <label class="label">First Name:</label>  {{ item.firstName }}</p>
+              <p class="subtitle is-6"> <label class="label">Last Name:</label>  {{ item.lastName }}</p>
             </div>
-          </div>
-          <div class="content">
-            <p class="subtitle is-6">Description: {{ task.description }}</p>
           </div>
         </div>
       </div>
@@ -26,9 +25,8 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, toRefs, computed, onMounted } from "vue";
+import { computed } from "vue";
 import { useStore } from "@/store";
-import { TaskItem } from "@/store/state";
 import { MutationType } from "@/store/mutations";
 export default {
   name: "EditModal",
@@ -38,16 +36,16 @@ export default {
   setup(props: any) {
     const store = useStore();
 
-    const task = computed(() => store.getters.getTaskById(Number(props.id)));
+    const item = computed(() => store.getters.getItemById(Number(props.id)));
 
     const closeModal = () => {
-      store.commit(MutationType.SetTaskModal, {
+      store.commit(MutationType.SetItemModal, {
         showModal: false,
-        taskId: undefined,
+        itemId: undefined,
       });
     };
 
-    return { closeModal, task };
+    return { closeModal, item };
   },
 };
 </script>

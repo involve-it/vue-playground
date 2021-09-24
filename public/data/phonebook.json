@@ -1,0 +1,13 @@
+[{
+  "id": 1632477656050,
+  "phoneNumber": "+16458929800",
+  "email": "fake@fake.com",
+  "firstName": "John",
+  "lastName": "Doe"
+}, {
+  "id": 1632477663634,
+  "phoneNumber": "+76458929800",
+  "email": "fake1@fake1.ru",
+  "firstName": "Vasya",
+  "lastName": "Pupkin"
+}]

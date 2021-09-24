@@ -2,51 +2,51 @@
   <div class="modal is-active">
     <div class="modal-background"></div>
     <div class="modal-content">
-      <form @submit.prevent="updateTask">
-          <h1>Edit Modal</h1>
+      <form @submit.prevent="updateItem">
+        <h1>Edit Modal</h1>
         <div class="field">
-          <label class="label">Task Title</label>
+          <label :class="{label:true, error:vuelidator.phoneNumber.$error}">Phone Number</label>
           <div class="control">
             <input
-              v-model="title"
-              class="input"
-              type="text"
-              placeholder="Enter task"
+                v-model="phoneNumber"
+                class="input"
+                type="text"
+                placeholder="Phone Number"
             />
           </div>
         </div>
 
         <div class="field">
-          <label class="label">Description</label>
-          <div class="control">
-            <textarea
-              v-model="description"
-              class="textarea"
-              placeholder="Textarea"
-            ></textarea>
-          </div>
-        </div>
-
-        <div class="field">
-          <label class="label">Assigned By</label>
+          <label :class="{label:true, error:vuelidator.email.$error}">Email</label>
           <div class="control">
             <input
-              v-model="createdBy"
-              class="input"
-              type="text"
-              placeholder="Enter Assigner's name"
+                v-model="email"
+                class="input"
+                type="text"
+                placeholder="Enter email"
             />
           </div>
         </div>
 
         <div class="field">
-          <label class="label">Assigned To</label>
+          <label :class="{label:true, error:vuelidator.firstName.$error}">First Name</label>
           <div class="control">
             <input
-              v-model="assignedTo"
-              class="input"
-              type="text"
-              placeholder="Enter task creator's name"
+                v-model="firstName"
+                class="input"
+                type="text"
+                placeholder="Enter user's first name"
+            />
+          </div>
+        </div>
+        <div class="field">
+          <label :class="{label:true, error:vuelidator.lastName.$error}">Last Name</label>
+          <div class="control">
+            <input
+                v-model="lastName"
+                class="input"
+                type="text"
+                placeholder="Enter user's last name"
             />
           </div>
         </div>
@@ -60,6 +60,17 @@
           </div>
         </div>
       </form>
+      <div class="validator-errors">
+        <p
+            v-for="(error, index) of vuelidator.$errors"
+            :key="index"
+        >
+          <small>&nbsp; property</small>
+          <strong>&nbsp;{{ error.$property }}</strong>
+          <small>&nbsp;says:</small>
+          <strong>&nbsp;{{ error.$message }}</strong>
+        </p>
+      </div>
     </div>
     <button
       class="modal-close is-large"
@@ -69,10 +80,12 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, toRefs, computed, onMounted } from 'vue'
+import { reactive, toRefs, computed, onMounted } from 'vue'
 import { useStore } from '@/store'
-import { TaskItem } from '@/store/state'
+import { PhonebookItem } from '@/store/state'
 import { MutationType } from '@/store/mutations'
+import {email, helpers, required, requiredUnless} from "@vuelidate/validators";
+import {useVuelidate} from "@vuelidate/core";
 export default {
   name: 'EditModal',
   props: {
@@ -80,68 +93,72 @@ export default {
   },
   setup(props: any) {
     const state = reactive({
-      title: '',
-      description: '',
-      createdBy: '',
-      assignedTo: ''
+      phoneNumber: '',
+      email: '',
+      firstName: '',
+      lastName: ''
     })
     const store = useStore()
+    // validation part:
+    const rules = computed(() => ({
+      phoneNumber: { required },
+      email: { required, email },
+      firstName: { requiredUnless: helpers.withMessage('Either First Name OR Last Name is required',
+            requiredUnless(state.lastName))},
+      lastName: { requiredUnless: helpers.withMessage('Either First Name OR Last Name is required',
+            requiredUnless(state.firstName))}
+    }));
 
-    const getTaskById = computed(() => store.getters.getTaskById(Number(props.id)))
-    console.log("task by id", getTaskById)
+    const vuelidator = useVuelidate(rules, state)
+    const getItemById = computed(() => store.getters.getItemById(Number(props.id)))
+    console.log("item by id", getItemById)
 
 
 
     const setFields = () => {
-       const task = store.getters.getTaskById(Number(props.id))
-       if(task) {
-           console.log("task si kolo", task)
-           state.title = task.title
-           state.createdBy = task.createdBy
-           state.assignedTo = task.assignedTo
-           state.description = task.description
+       const item = store.getters.getItemById(Number(props.id))
+       if(item) {
+           console.log("item si kolo", item)
+           state.phoneNumber = item.phoneNumber
+           state.email = item.email
+           state.firstName = item.firstName
+           state.lastName = item.lastName
        }
     }
 
     onMounted(() => { setFields() });
+    const closeModal = () => {
+      store.commit(MutationType.SetEditModal, {showModal: false, itemId: undefined})
+      vuelidator.value.$reset();
+    }
+    const updateItem = () => {
+      vuelidator.value.$validate();
+      if (vuelidator.value.$error) {
+        return;
+      }
 
-    const updateTask = () => {
-      if (
-        state.title === '' ||
-        state.description === '' ||
-        state.createdBy === '' ||
-        state.assignedTo === ''
-      )
-        return
-
-      const task: TaskItem = {
+      const item: PhonebookItem = {
         id: props.id,
-        title: state.title,
-        description: state.description,
-        createdBy: state.createdBy,
-        assignedTo: state.assignedTo,
-        completed: false,
+        phoneNumber: state.phoneNumber,
+        email: state.email,
+        firstName: state.firstName,
+        lastName: state.lastName,
         editing: false
       }
-      store.commit(MutationType.UpdateTask, task)
-      state.title = ''
-      state.createdBy = ''
-      state.assignedTo = ''
-      state.description = ''
+      store.commit(MutationType.UpdateItem, item)
+      state.phoneNumber = ''
+      state.email = ''
+      state.firstName = ''
+      state.lastName = ''
+      closeModal();
     }
 
-    const closeModal = () => {
-      store.commit(MutationType.SetEditModal, {showModal: false, taskId: undefined})
-    }
-
-    return { closeModal, ...toRefs(state), updateTask }
+    return { closeModal, ...toRefs(state), updateItem, vuelidator }
   }
 }
 </script>
 <style scoped>
-label {
-    color: #ffffff;
-}
+
 h1 {
     color: #ffffff;
     text-align: center;
