@@ -1,6 +1,6 @@
 <template>
   <th>{{ id }}</th>
-  <td>{{ phoneNumber }} <strong>(C)</strong></td>
+  <td>{{ phoneNumber }}</td>
   <td>{{ email }}</td>
   <td>{{ firstName }}</td>
   <td>{{ lastName }}</td>
@@ -20,6 +20,7 @@
 import { defineComponent } from 'vue'
 import { useStore } from '@/store'
 import { MutationType } from '@/store/mutations'
+import {ActionTypes} from "@/store/actions";
 
 export default defineComponent({
   props: {
@@ -36,7 +37,7 @@ export default defineComponent({
     const store = useStore()
 
     const removeItem = () => {
-      store.commit(MutationType.RemoveItem, {
+      store.dispatch(ActionTypes.RemoveItem, {
         id: props.id
       })
     }

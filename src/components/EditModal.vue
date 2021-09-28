@@ -86,6 +86,7 @@ import { PhonebookItem } from '@/store/state'
 import { MutationType } from '@/store/mutations'
 import {email, helpers, required, requiredUnless} from "@vuelidate/validators";
 import {useVuelidate} from "@vuelidate/core";
+import {ActionTypes} from "@/store/actions";
 export default {
   name: 'EditModal',
   props: {
@@ -145,7 +146,7 @@ export default {
         lastName: state.lastName,
         editing: false
       }
-      store.commit(MutationType.UpdateItem, item)
+      store.dispatch(ActionTypes.UpdateItem, item)
       state.phoneNumber = ''
       state.email = ''
       state.firstName = ''

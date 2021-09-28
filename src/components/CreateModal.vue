@@ -98,6 +98,7 @@ import { PhonebookItem } from '@/store/state'
 import { MutationType } from '@/store/mutations'
 import { useVuelidate } from '@vuelidate/core'
 import { email, required, requiredUnless, helpers } from '@vuelidate/validators'
+import {ActionTypes} from "@/store/actions";
 
 export default {
   name: 'CreateModal',
@@ -125,7 +126,6 @@ export default {
     const closeModal = () => {
       store.commit(MutationType.SetCreateModal, false)
       vuelidator.value.$reset();
-      vuelidator.value.$touch();
     }
 
     function createItem() {
@@ -142,7 +142,7 @@ export default {
         lastName: state.lastName,
         editing: false
       }
-      store.commit(MutationType.CreateItem, item)
+      store.dispatch(ActionTypes.CreateItem, item);
       state.id = Date.now();
       state.phoneNumber = ''
       state.email = ''
